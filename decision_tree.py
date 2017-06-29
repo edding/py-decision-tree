@@ -25,23 +25,7 @@ class DecisionTree:
         self._split_node(node.right)
 
     def describe(self):
-        if self.root is None:
-            print("Not trained.")
-        else:
-            pproot = self._convert_to_pptree()
-            pp.print_tree(pproot)
-
-    def _convert_to_pptree(self):
-        def _build(node, parent):
-            if node is None:
-                return
-            ppnode = pp.Node(str(node), parent=parent)
-            _build(node.left, ppnode)
-            _build(node.right, ppnode)
-
-            return ppnode
-
-        return _build(self.root, None)
+            pp.print_tree(self.root)
 
     def find(self, x):
         return self._find(x, self.root)
@@ -56,7 +40,7 @@ class DecisionTree:
 
 
 class Node:
-    def __init__(self, X, y, n_class=0, gini=-1.0, depth=0):
+    def __init__(self, X, y, n_class=0, gini=-1.0, depth=0, parent=None):
         self.gini = gini
 
         self.X = X
@@ -71,6 +55,11 @@ class Node:
 
         self.left = None
         self.right = None
+
+        # For pptree printing
+        self.children = []
+        if parent:
+            parent.children.append(self)
 
     def __str__(self):
         if self.condition is None:
@@ -105,8 +94,8 @@ class Node:
         self.condition = Condition(idx, val)
 
         # Set left & right child
-        self.left = Node(X_l, y_l, n_class=self.n_class, gini=g_l, depth=self.depth + 1)
-        self.right = Node(X_r, y_r, n_class=self.n_class, gini=g_r, depth=self.depth + 1)
+        self.left = Node(X_l, y_l, n_class=self.n_class, gini=g_l, depth=self.depth + 1, parent=self)
+        self.right = Node(X_r, y_r, n_class=self.n_class, gini=g_r, depth=self.depth + 1, parent=self)
 
 
 class Condition:
